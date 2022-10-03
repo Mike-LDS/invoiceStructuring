@@ -65,7 +65,7 @@ while True:
                     if 'explicit' in row['Description'].lower():
                         item = 'Explicit Instruction'
                     elif 'support' in row['Description'].lower():
-                        item = 'Remedial & Homework Support'
+                        item = 'Homework Support'
                     elif 'rise at school' in row['Description'].lower():
                         item = 'RISE AT School'
                     elif 'slp' in row['Description'].lower():
@@ -181,7 +181,7 @@ while True:
                 if row[header_s.index('Item')] == 'Social Language Group':
                     row[header_s.index('Item')] = 'SLP'
                 elif row[header_s.index('Item')] == 'Summer Tutoring':
-                    row[header_s.index('Item')] = 'Remedial & Homework Support'
+                    row[header_s.index('Item')] = 'Homework Support'
             for row in adhoc:
                 if row[header_s.index('Item')] == 'Summer Camp' or row[header_s.index('Item')] == 'Spring Break Camp':
                     row[header_s.index('Item')] = 'CAMPS'
@@ -237,12 +237,6 @@ while True:
             window['-TEXT-'].update("INVOICES ARE READY")
 
         except Exception as e:
-##            if values["-USERS-"] == '':
-##                e = "No Student File Selected"
-##            elif values["-INVOICES-"] == '':
-##                e = "No Invoice File Selected"
-##            else:
-##                continue
             sg.Popup(e, title='ERROR')
 
 window.close()

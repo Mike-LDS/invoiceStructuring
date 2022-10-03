@@ -10,7 +10,7 @@ from setuptools import setup
 APP = ['invoiceStructuring.py']
 DATA_FILES = []
 OPTIONS = {
-    'iconfile':'CFE.icns'
+    'iconfile':'LDS.icns'
     }
 
 setup(
