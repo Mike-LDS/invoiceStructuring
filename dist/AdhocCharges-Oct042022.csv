@@ -1,0 +1,20 @@
+Invoice Number,Customer,Invoice Date,Due Date,Item,Item Description,Quantity,Rate,Total,Item Tax Code
+10015,"Ratcliffe, Cody",13/09/2022,18/09/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10016,"Lin, Gavin",15/09/2022,20/09/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10017,"Gray, Nathan",15/09/2022,20/09/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10018,"Green, Lexi",15/09/2022,20/09/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10019,"Dayson, Megan",16/09/2022,21/09/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10020,"Woo, Oliver",20/09/2022,25/09/2022,Early RISErs,Fall 2022 Early RISErs program fee,1.00000,595.00000,595.00000,E,Exclusive
+10021,"Samuel, Fifi",21/09/2022,26/09/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10022,"Kheraj, Nthati",21/09/2022,26/09/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10023,"Pyne, Javell",27/09/2022,02/10/2022,ERROR,"Psychoeducational assessment and consultation fees
+UBC total: $1,800
+Your portion: $325",1.00000,325.00000,325.00000,E,Exclusive
+10024,"Kwan, Galex",27/09/2022,02/10/2022,ERROR,"Psychoeducational assessment and consultation fees - Galex K.
+UBC total: $1,800
+Your portion: $325",1.00000,325.00000,325.00000,E,Exclusive
+10025,"Shafighy, Avissa (Nora)",27/09/2022,02/10/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,100.00000,100.00000,E,Exclusive
+10026,"Dodge, Cecilia",28/09/2022,03/10/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10027,"Umphress, Connor",29/09/2022,04/10/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10028,"Heynen, Isaac",30/09/2022,05/10/2022,Intake and Assessment Fee,Intake and Onboarding Fee,1.00000,150.00000,150.00000,E,Exclusive
+10029,"Vassallo, Nicholas",03/10/2022,08/10/2022,Summer RISE,Intensive Intervention Program 3/3,1.00000,2200.00000,2200.00000,E,Exclusive

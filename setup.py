@@ -5,17 +5,16 @@ Usage:
     python setup.py py2app
 """
 
-from setuptools import setup
+from distutils.core import setup
+import py2exe
 
-APP = ['invoiceStructuring.py']
-DATA_FILES = []
 OPTIONS = {
     'iconfile':'LDS.icns'
     }
 
 setup(
-    app=APP,
-    data_files=DATA_FILES,
-    options={'py2app': OPTIONS},
-    setup_requires=['py2app'],
+    windows=[{
+        'script':'invoiceStructuring.py',
+        "icon_resources": [(1, "LDS.ico")]
+        }]
 )

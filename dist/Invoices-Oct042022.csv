@@ -1,0 +1,18 @@
+Invoice Number,Customer,Invoice Date,Due Date,Item,Item Description,Quantity,Rate,Total,Item Tax Code
+9999,"Behrenbruch, Axel",01/09/2022,13/09/2022,Homework Support,Summer Tutoring on 24/08/2022,1.0,42.5,42.5,E
+9999,"Behrenbruch, Axel",01/09/2022,13/09/2022,Homework Support,"Summer Tutoring on 16/08/2022, 17/08/2022",2.0,15.0,30.0,E
+10000,"Vassallo, Nicholas",03/10/2022,08/10/2022,Explicit Instruction,"Explicit Instruction on 27/09/2022, 20/09/2022, 13/09/2022, 29/09/2022, 22/09/2022, 08/09/2022",6.0,85.0,510.0,E
+10001,"Vassallo, Amelia",03/10/2022,08/10/2022,Explicit Instruction,"Explicit Instruction on 27/09/2022, 29/09/2022, 22/09/2022, 15/09/2022, 08/09/2022",5.0,85.0,425.0,E
+10002,"Vassallo, Matthew",03/10/2022,08/10/2022,Explicit Instruction,"Explicit Instruction on 29/09/2022, 27/09/2022, 22/09/2022, 20/09/2022, 15/09/2022, 13/09/2022, 08/09/2022",7.0,85.0,595.0,E
+10003,"Cummer, Carrick",03/10/2022,09/10/2022,Explicit Instruction,Explicit Instruction on 27/09/2022,1.0,85.0,85.0,E
+10004,"Caron-Ahroon, Parisa",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 28/09/2022, 27/09/2022, 21/09/2022, 20/09/2022, 14/09/2022, 13/09/2022, 07/09/2022",7.0,70.0,490.0,E
+10005,"Tran, Sienna",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 28/09/2022, 26/09/2022, 21/09/2022, 19/09/2022, 12/09/2022, 14/09/2022",6.0,85.0,510.0,E
+10006,"Lloyd Mayeta, Nathaniel",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 09/09/2022, 26/09/2022, 23/09/2022, 19/09/2022, 16/09/2022, 12/09/2022",6.0,70.0,420.0,E
+10007,"Webb-Bryant, Alexandra (Alex)",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 23/09/2022, 09/09/2022, 28/09/2022, 07/09/2022",4.0,85.0,340.0,E
+10008,"Fouda, Yousef",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 23/09/2022, 16/09/2022, 09/09/2022",3.0,15.0,45.0,E
+10009,"Fouda, Adham",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 27/09/2022, 20/09/2022, 13/09/2022, 23/09/2022, 16/09/2022, 09/09/2022",6.0,15.0,90.0,E
+10010,"Dallaglio, Ethan",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 07/09/2022, 28/09/2022, 26/09/2022, 21/09/2022, 19/09/2022",5.0,85.0,425.0,E
+10011,"Lennon, Eilidh",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 29/09/2022, 27/09/2022, 22/09/2022, 20/09/2022, 15/09/2022, 13/09/2022",6.0,85.0,510.0,E
+10012,"Lennon, Rory",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 27/09/2022, 20/09/2022, 13/09/2022",3.0,85.0,255.0,E
+10013,"Andersen, Clara",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 28/09/2022, 26/09/2022, 21/09/2022, 19/09/2022, 14/09/2022, 12/09/2022, 07/09/2022",7.0,15.0,105.0,E
+10014,"Andersen, Calina",03/10/2022,09/10/2022,Explicit Instruction,"Explicit Instruction on 28/09/2022, 26/09/2022, 21/09/2022, 19/09/2022, 14/09/2022, 12/09/2022, 07/09/2022",7.0,15.0,105.0,E
