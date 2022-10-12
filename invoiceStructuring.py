@@ -118,8 +118,9 @@ while True:
                                 match = False
                                 for student in client_2_students:
                                     if client_ID == student[2]:
+                                        line = ''
                                         for i in range(len(student[1].split(' ',-1))):
-                                            if student[1].split(' ',-1)[i] in row['Description']:
+                                            if student[1].split(' ',-1)[i] in row['Description'] and line == '':
                                                 customer = student[0]
                                                 line = [row['InvoiceNumber'], customer, client[2], client[3], item, row['Quantity'], row['UnitAmount'], cost,'E','Exclusive',row['StartDate']]
                                                 invoice_detialed.append(line)
@@ -235,6 +236,12 @@ while True:
                     writer.writerow(row)
 
             window['-TEXT-'].update("Invoices are Ready")
+            client_2_students = []
+            invoice_2_client = []
+            invoice_detialed = []
+            invoice_sum = []
+            error= []
+            adhoc = []
 
         except Exception as e:
             sg.Popup(e, title='ERROR')
