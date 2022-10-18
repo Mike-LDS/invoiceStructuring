@@ -86,7 +86,7 @@ layout = [
     [sg.Button("RUN"),sg.Text("", key='-TEXT-')]]
 
 # Building Window
-window = sg.Window('Invoice Structuring', layout, size=(700,350))
+window = sg.Window('Invoice Structuring', layout, size=(750,400))
     
 while True:
     event, values = window.read()

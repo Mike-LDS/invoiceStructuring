@@ -8,10 +8,6 @@ Usage:
 from distutils.core import setup
 import py2exe
 
-OPTIONS = {
-    'iconfile':'LDS.icns'
-    }
-
 setup(
     windows=[{
         'script':'invoiceStructuring.py',
