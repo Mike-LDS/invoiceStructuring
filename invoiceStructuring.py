@@ -1,301 +1,178 @@
-#!/usr/bin/env python3
-
+import requests
+import json
+import pandas as pd
+import time
+import datetime
 import PySimpleGUI as sg
 import os.path
-import csv
-import datetime
 
-client_2_students = []
-invoice_2_client = []
-invoice_detialed = []
-invoice_sum = []
-zero_d_detialed = []
-zero_d_sum = []
-error= []
-adhoc = []
 
-# Define Program Function
-def pro_ident(desc):
-    if 'explicit' in desc.lower():
-        item = 'Explicit Instruction'
-    elif 'support' in desc.lower():
-        item = 'Homework Support'
-    elif 'rise at school' in desc.lower():
-        item = 'RISE AT School'
-    elif 'slp' in desc.lower():
-        item = 'SLP'
-    elif 'rise now' in desc.lower():
-        item = 'RISE Now'
-    elif 'rise team' in desc.lower():
-        item = 'RISE Team'
-    elif 'ktea-3' in desc.lower():
-        item = 'KTEA-3 Assessment'
-    elif 'social language group' in desc.lower():
-        item = 'Social Language Group'
-    elif 'summer tutoring' in desc.lower():
-        item = 'Summer Tutoring'
-    elif 'summer rise' in desc.lower():
-        item = 'Summer RISE'
-    elif 'intensive' in desc.lower():
-        item = 'Summer RISE'
-    elif 'summer camp' in desc.lower():
-        item = 'Summer Camp'
-    elif 'spring break camp' in desc.lower():
-        item = 'Spring Break Camp'
-    elif 'early risers' in desc.lower():
-        item = 'Early RISErs'
-    elif 'intake' in desc.lower():
-        item = 'Intake and Onboarding Fee'
-    elif 'onboarding' in desc.lower():
-        item = 'Intake and Assessment Fee'
-    elif 'social language' in desc.lower():
-        item = 'SLP'
-    elif 'family coaching' in desc.lower():
-        item = 'Family Coaching'
-    elif 'p.e.e.r.s' in desc.lower():
-        item = 'P.E.E.R.S'
-    elif 'homework club' in desc.lower():
-        item = 'Homework Club'
-    elif 'neuropsychological' in desc.lower():
-        item = 'Neuropsychological Assessment Fees'
-    elif 'parent workshop' in desc.lower():
-        item = 'Parent Workshop'
-    elif 'wamms' in desc.lower():
-        item = 'WAMMS'
-    else:
-        item = 'ERROR'
-    return item
-
-header_d = ['Invoice Number', 'Customer', 'Invoice Date', 'Due Date', 'Item', 'Quantity', 'Rate', 'Total', 'Item Tax Code', 'Exc/Inc of Tax', 'Service Date']
-header_s = ['Invoice Number', 'Customer', 'Invoice Date', 'Due Date', 'Item', 'Item Description','Quantity', 'Rate', 'Total', 'Item Tax Code']
-
+#------------------------------------------------ Building Window --------------------------------------------------------#
 sg.theme("Dark2")
 layout = [
     [sg.T("")],
-    [sg.Text("Choose Student Export: "), sg.Input(), sg.FileBrowse(file_types=(('CSV Files', '*.CSV'),), key='-USERS-')],
-    [sg.Text('Go to TC -> System -> Exports -> Click on Users -> Select Students from drop down menu -> Click Submit')],
+    [sg.Text("Date Range:"), sg.InputText(size=(20,20), key='-START-'),sg.Text(" to ") ,sg.InputText(size=(20,20), key='-END-')],
+    [sg.Text("Date Format should be YYYY-MM-DD (e.g. 2023-05-30)")],
     [sg.T("")],
-    [sg.Text("Choose Invoice Export:  "), sg.Input(), sg.FileBrowse(file_types=(('CSV Files', '*.CSV'),), key='-INVOICES-')],
-    [sg.Text('Go to TC -> System -> Exports -> Click on Accounting-> Select date range & Invoices (Detialed) -> Click Submit')],
-    [sg.T("")],
-    [sg.Text("Choose Lesson Export:  "), sg.Input(), sg.FileBrowse(file_types=(('CSV Files', '*.CSV'),), key='-LESSONS-')],
-    [sg.Text('NOT REQUIRED. Go to TC -> System -> Exports -> Click on Lessons-> Select date range -> Click Submit')],
-    [sg.T("")],
-    [sg.Text("Starting Invoice Number:"), sg.InputText(size=(10,6), key='-NUM-')],
+    [sg.Text("Starting Invoice Number:"), sg.InputText(size=(20,20), key='-NUM-')],
     [sg.T("")],
     [sg.Button("RUN"),sg.Text("", key='-TEXT-')]]
 
-# Building Window
-window = sg.Window('Invoice Structuring', layout, size=(750,400))
-    
+window = sg.Window('Invoice Structuring', layout, size=(500,200))
+
 while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event=="EXIT":
         break
-        
+#------------------------------------------------ Processing Invoices --------------------------------------------------------#
     elif event == "RUN":
-# Reading TC Exports
         try:
+            lessons_export = pd.DataFrame({'Invoice Number': [], 'Customer':[],'Invoice Date':[],'Due Date':[],'Item':[], 'Item Description':[], 'Quantity':[], 'Rate':[], 'Total':[], 'Item Tax Code':[]})
+            charges_export = pd.DataFrame({'Invoice Number': [], 'Customer':[],'Invoice Date':[],'Due Date':[],'Item':[], 'Item Description':[], 'Quantity':[], 'Rate':[], 'Total':[], 'Item Tax Code':[]})
+            service_list = {}
+
+            headers = {
+              'Authorization': 'Token token=st_live_fvXWm27jS_Q_BRtwYWH5lg',
+              'Content-Type': 'application/json'
+            }
+
             inv_num = int(values['-NUM-'])
-        # Defining Link Between Parent & Student
-            with open(values['-USERS-'], newline='', encoding="utf-8") as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    i = 1
-                    line = [(row['Last name'] + ', ' + row['First name']), row['First name'], row['Client ID']]
-                    client_2_students.append(line)
 
-        # Defining Link Between Parent & Invoice
-            with open(values['-INVOICES-'], newline='', encoding="utf-8") as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    if row['InvoiceNumber'] in (client[1] for client in invoice_2_client):
-                        continue
-                    else:
-                        line = [row['ID'], row['InvoiceNumber'], row['InvoiceDate'], row['DueDate']]
-                        invoice_2_client.append(line)
+            #----------------- Creating a Service List ---------------------------------------#
+            s_url = "https://api.teachworks.com/v1/services?per_page=50"
 
-        # Creating Line By Line Array
-            with open(values['-INVOICES-'], newline='', encoding="utf-8") as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    item = pro_ident(row['Description'])
-                    if row['TrackingOption1'] == "lesson":
-                        cost = float(row['Quantity'])*float(row['UnitAmount'])
-                        for client in invoice_2_client:
-                            if row['InvoiceNumber'] in client[1]:
-                                client_ID = client[0]
-                                match = False
-                                for student in client_2_students:
-                                    if client_ID == student[2]:
-                                        line = ''
-                                        for i in range(len(student[1].split(' ',-1))):
-                                            if student[1].split(' ',-1)[i] in row['Description'] and line == '':
-                                                customer = student[0]
-                                                line = [row['InvoiceNumber'], customer, client[2], client[3], item, row['Quantity'], row['UnitAmount'], cost,'E','Exclusive',row['StartDate']]
-                                                invoice_detialed.append(line)
-                                                match = True
-                                if match == False:
-                                    for student in client_2_students:
-                                        if client_ID == student[2]:
-                                            customer = student[0]
-                                            line = [row['InvoiceNumber'], customer, client[2], client[3], item, row['Quantity'], row['UnitAmount'], cost,'E','Exclusive',row['StartDate']]
-                                            invoice_detialed.append(line)
-                                            match = True
-                                            break
-                                if match == False:
-                                    line = [row['InvoiceNumber'], client_ID, client[2], client[3], item, row['Quantity'], row['UnitAmount'], cost,'E','Exclusive',row['StartDate']]
-                                    invoice_detialed.append(line)
 
-                    elif row['TrackingOption1'] == "adhoc_charge":
-                        for client in invoice_2_client:
-                            if row['InvoiceNumber'] in client[1]:
-                                client_ID = client[0]
-                                match = False
-                                for student in client_2_students:
-                                    if client_ID == student[2]:
-                                        line = ''
-                                        for i in range(len(student[1].split(' ',-1))):
-                                            if student[1].split(' ',-1)[i] in row['Description'] and line == '':
-                                                customer = student[0]
-                                                line = ['', customer, row['InvoiceDate'], row['DueDate'], item, row['Description'], row['Quantity'], row['UnitAmount'], row['UnitAmount'],'E','Exclusive']
-                                                adhoc.append(line)
-                                                match = True
-                                if match == False:
-                                    for student in client_2_students:
-                                        if client_ID == student[2]:
-                                            customer = student[0]
-                                            line = ['', customer, row['InvoiceDate'], row['DueDate'], item, row['Description'], row['Quantity'], row['UnitAmount'], row['UnitAmount'],'E','Exclusive']
-                                            adhoc.append(line)
-                                            match = True
-                                            break
-                                if match == False:
-                                    line = ['', client_ID, row['InvoiceDate'], row['DueDate'], item, row['Description'], row['Quantity'], row['UnitAmount'], row['UnitAmount'],'E','Exclusive']
-                                    adhoc.append(line)
-                                    
-        # Grouping Invoices
-            for row in invoice_detialed:
-                match = False
-                for line in invoice_sum:
-                    if line[header_s.index('Customer')] == row[header_d.index('Customer')] and line[header_s.index('Item')] == row[header_d.index('Item')] and float(line[header_s.index('Rate')]) == float(row[header_d.index('Rate')]):
-                        line[header_s.index('Quantity')] = float(line[header_s.index('Quantity')]) + float(row[header_d.index('Quantity')])
-                        line[header_s.index('Total')] = float(line[header_s.index('Quantity')])*float(line[header_s.index('Rate')])
-                        line[header_s.index('Item Description')] = line[header_s.index('Item Description')]+ ', ' + row[header_d.index('Service Date')]
-                        match = True
-                if match == False:
-                    line = ['', row[header_d.index('Customer')], row[header_d.index('Invoice Date')], row[header_d.index('Due Date')], row[header_d.index('Item')],
-                            row[header_d.index('Item')]+' on '+row[header_d.index('Service Date')], float(row[header_d.index('Quantity')]), float(row[header_d.index('Rate')]),
-                            float(row[header_d.index('Quantity')])*float(row[header_d.index('Rate')]), row[header_d.index('Item Tax Code')]]
-                    invoice_sum.append(line)
+            response = requests.request("GET", s_url, headers=headers, data={})
+            service_info = response.json()
+            for i in range(0,len(service_info)):
+                service_list[service_info[i]["id"]] = service_info[i]["name"]
+
+            #----------------- Pulling Invoices ---------------------------------------#
+
+            url = "https://api.teachworks.com/v1/invoices?per_page=80&page="
+
+            payload= json.dumps({
+             "date":{"gte":values['-START-'], "lte":values['-END-']}
+            })
+
+            j = 1
+            num = 0
+            flag = False
+            while flag == False:
+                window['-TEXT-'].update("Pulling Invoices from Page "+str(j))
+                response = requests.request("GET", url+str(j), headers=headers, data=payload)
+                invoices = response.json()
+                if invoices == ['Rate Limit Exceeded']:
+                    time.sleep(0.1)
+                    response = requests.request("GET", url+str(j), headers=headers, data=payload)
+                    invoices = response.json()
+                for i in range(0,len(invoices)):
+                    fam_id = invoices[i]["customer_id"]
+                    date = invoices[i]["date"]
+                    due = invoices[i]["due_date"]
                     
-        # Adjust GL Codes 
-            for row in invoice_sum:
-                if row[header_s.index('Item')] == 'Social Language Group':
-                    row[header_s.index('Item')] = 'SLP'
-                elif row[header_s.index('Item')] == 'Summer Tutoring':
-                    row[header_s.index('Item')] = 'Homework Support'
-            for row in adhoc:
-                if row[header_s.index('Item')] == 'Summer Camp' or row[header_s.index('Item')] == 'Spring Break Camp':
-                    row[header_s.index('Item')] = 'CAMPS'
+            #----------------- Compiling Individual Lessons ---------------------------------------#
+                    for lesson in invoices[i]["lessons"]:
+                        cusomter = lesson['student_id']
+                        item = service_list[lesson['service_id']]
+                        item_d = item + ' on ' +(lesson['description'].split('\r\n',1)[1]).split(' ',1)[0]
+                        rate = lesson['invoice_unit_price']
+                        total = lesson['invoice_amount']
+                        duration = (lesson['description'].split('\r\n',1)[1]).split(' ',1)[1]
+                        start_time = datetime.datetime.strptime(duration.split(' - ',-1)[0], '%I:%M %p')
+                        end_time = datetime.datetime.strptime(duration.split(' - ',-1)[1], '%I:%M %p')
+                        quantity = abs((end_time - start_time).total_seconds())/3600
 
-        # Adding Invoice Number:
-            for row in invoice_sum:
-                match = False
-                for line in invoice_sum:
-                    if line[header_s.index('Customer')] == row[header_s.index('Customer')] and line[header_s.index('Invoice Number')] != '':
-                        row[header_s.index('Invoice Number')] = line[header_s.index('Invoice Number')]
-                        match = True
-                if match == False:
-                    row[header_s.index('Invoice Number')] = inv_num
-                    inv_num = inv_num + 1
+                        line = pd.DataFrame({'Customer':str(cusomter),'Invoice Date':date,'Due Date':due,'Item':str(item), 'Item Description':item_d, 'Quantity':quantity, 'Rate':rate, 'Total':total,
+                                             'Item Tax Code':'E'}, index=[num])
+                        lessons_export = pd.concat([lessons_export,line])
+                        num = num + 1
 
-            for row in adhoc:
-                match = False
-                for line in adhoc:
-                    if line[header_s.index('Customer')] == row[header_s.index('Customer')] and line[header_s.index('Invoice Number')] != '':
-                        row[header_s.index('Invoice Number')] = line[header_s.index('Invoice Number')]
-                        match = True
-                if match == False:
-                    row[header_s.index('Invoice Number')] = inv_num
-                    inv_num = inv_num + 1
+            #----------------- Compiling Individual Charges ---------------------------------------#
+                    for charge in invoices[i]["charges"]:
+                        quantity = charge["quantity"]
+                        rate = charge["unit_price"]
+                        total = charge["amount"]
+                        item_d = charge["description"]
+                        item = charge["title"]
+                        
+                        inv_num = inv_num + 1
+                        line = pd.DataFrame({'Invoice Number': 'INV-'+ str(inv_num), 'Customer':fam_id,'Invoice Date':date,'Due Date':due,'Item':item, 'Item Description':item_d, 'Quantity':quantity, 'Rate':rate, 'Total':total,
+                                             'Item Tax Code':'E'}, index=[num])
+                        charges_export = pd.concat([charges_export,line])
+                        num = num + 1
 
-        # Zero Dollar Lessons
-            if values['-LESSONS-'] != '':
-                with open(values['-LESSONS-'], newline='', encoding="utf-8") as csvfile:
-                    reader = csv.DictReader(csvfile)
-                    for row in reader:
-                        if float(row['charge_rate_1']) == 0 and row['recipient_1'] != 'LDS Admin' and row['recipient_1'] != "St. Patrick's Secondary":
-                            for student in client_2_students:
-                                if student[2] == row['client_id_1']:
-                                    item = pro_ident(row['topic'])
-                                    line = ['', student[0], row['start'], row['start'], item, row['units_raw'], 0, 0, 'E','Exclusive',row['start']]
-                                    zero_d_detialed.append(line)
+                j = j + 1
+                if invoices == [] or j == 100000:
+                    flag = True
 
-                for row in zero_d_detialed:
-                    match = False
-                    for line in zero_d_sum:
-                        if line[header_s.index('Customer')] == row[header_d.index('Customer')] and line[header_s.index('Item')] == row[header_d.index('Item')] and float(line[header_s.index('Rate')]) == float(row[header_d.index('Rate')]):
-                            line[header_s.index('Quantity')] = float(line[header_s.index('Quantity')]) + float(row[header_d.index('Quantity')])
-                            line[header_s.index('Total')] = float(line[header_s.index('Quantity')])*float(line[header_s.index('Rate')])
-                            line[header_s.index('Item Description')] = line[header_s.index('Item Description')]+ ', ' + row[header_d.index('Service Date')]
-                            match = True
-                    if match == False:
-                        line = ['', row[header_d.index('Customer')], row[header_d.index('Invoice Date')], row[header_d.index('Due Date')], row[header_d.index('Item')],
-                                row[header_d.index('Item')]+' on '+row[header_d.index('Service Date')], float(row[header_d.index('Quantity')]), float(row[header_d.index('Rate')]),
-                                float(row[header_d.index('Quantity')])*float(row[header_d.index('Rate')]), row[header_d.index('Item Tax Code')]]
-                        zero_d_sum.append(line)
+            #--------------------------- Adding INV # for Lessons ----------------------------------#
+            students = lessons_export['Customer'].unique()
+            families = charges_export['Customer'].unique()
 
-            # Clearing Previous Invoices
-                path = os.getcwd().split('dist',1)[0]
-                x = datetime.datetime.now()
-                file = '/ZeroDollarInvoices-' + x.strftime("%b") + x.strftime("%d") + x.strftime("%Y")+ '.csv'
-                f = open(path+file, 'w', newline='', encoding="utf-8")
-                f.close()
+            for student in students:
+                inv_num = inv_num + 1
+                lessons_export.loc[(lessons_export['Customer'] == student, 'Invoice Number')] = 'INV-'+str(inv_num)
+                
+            #----------------- Replacing the Customer Name (Lessons)------------------------------#
+
+            window['-TEXT-'].update("Formattting Lesson Invoices")
+            for student in students:
+                stu_url = "https://api.teachworks.com/v1/students/"+student
+                response = requests.request("GET", stu_url, headers=headers, data={})
+                stu_info = response.json()
+
+                if stu_info == ['Rate Limit Exceeded']:
+                    time.sleep(0.1)
+                    response = requests.request("GET", stu_url, headers=headers, data={})
+                    stu_info = response.json()
+
+                if stu_info == ['Not Found']:
+                    time.sleep(0.1)
+                    ind_url = "https://api.teachworks.com/v1/customers/"+student
+                    response = requests.request("GET", ind_url, headers=headers, data={})
+                    stu_info = response.json()
+                    
+                customer = stu_info['last_name'] +', '+stu_info['first_name']
+                lessons_export = lessons_export.replace({'Customer':student}, {'Customer':customer}, regex=False)
+
+
+            #----------------- Replacing the Customer Name (Charges)------------------------------#
+
+            window['-TEXT-'].update("Formattting Charges")
+            for family in families:
+                stu_url = "https://api.teachworks.com/v1/students"
+                payload = json.dumps({"customer_id":family})
+                
+                response = requests.request("GET", stu_url, headers=headers, data=payload)
+                stu_info = response.json()
+                
+                if stu_info == ['Rate Limit Exceeded']:
+                    time.sleep(0.1)
+                    response = requests.request("GET", stu_url, headers=headers, data=payload)
+                    stu_info = response.json()
+
+                if stu_info == ['Not Found']:
+                    time.sleep(0.1)
+                    ind_url = "https://api.teachworks.com/v1/customers/"+student
+                    response = requests.request("GET", ind_url, headers=headers, data={})
+                    stu_info = response.json()
+
+                if len(stu_info) == 1:
+                    customer = stu_info[0]['last_name'] +', '+stu_info[0]['first_name']
+                    charges_export = charges_export.replace({'Customer':family}, {'Customer':customer}, regex=False)
+                    
+            #----------------- Sorting and Exporting Invoices -----------------------------------#
+
+            lessons_export = lessons_export.sort_values(by=['Invoice Number'])
+            charges_export = charges_export.sort_values(by=['Invoice Number'])
             
-            # Writing Invoices to CSV
-                with open(path+file, 'w', newline='', encoding="utf-8") as csvfile:
-                    writer = csv.writer(csvfile)
-                    writer.writerow(header_s)
-                    for row in zero_d_sum:
-                        writer.writerow(row)   
-                            
-
-        # Clearing Previous Invoices
-            path = os.getcwd().split('dist',1)[0]
             x = datetime.datetime.now()
-            file = '/Invoices-' + x.strftime("%b") + x.strftime("%d") + x.strftime("%Y")+ '.csv'
-            f = open(path+file, 'w', newline='', encoding="utf-8")
-            f.close()
-            
-        # Writing Invoices to CSV
-            with open(path+file, 'w', newline='', encoding="utf-8") as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(header_s)
-                for row in invoice_sum:
-                    writer.writerow(row)
-
-        # Clearing Previous Invoices
-            x = datetime.datetime.now()
-            file = '/AdhocCharges-' + x.strftime("%b") + x.strftime("%d") + x.strftime("%Y")+ '.csv'
-            f = open(path+file, 'w', newline='', encoding="utf-8")
-            f.close()
-            
-        # Writing Invoices to CSV
-            with open(path+file, 'w', newline='', encoding="utf-8") as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(header_s)
-                for row in adhoc:
-                    writer.writerow(row)
-
+            file_name = 'Lessons-' + x.strftime("%b") + x.strftime("%d") + x.strftime("%Y")+ '.csv'
+            lessons_export.to_csv(file_name, index=False)
+            file_name = 'Charges-' + x.strftime("%b") + x.strftime("%d") + x.strftime("%Y")+ '.csv'
+            charges_export.to_csv(file_name,index=False)
             window['-TEXT-'].update("Invoices are Ready")
-            client_2_students = []
-            invoice_2_client = []
-            invoice_detialed = []
-            invoice_sum = []
-            zero_d_detialed = []
-            zero_d_sum = []
-            error= []
-            adhoc = []
 
         except Exception as e:
             sg.Popup(e, title='ERROR')
